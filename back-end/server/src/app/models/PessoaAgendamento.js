@@ -4,10 +4,6 @@ class PessoaAgendamento extends Model {
   static init(sequelize) {
     super.init(
       {
-        id: {
-          type: Sequelize.VIRTUAL,
-          primaryKey: true,
-        },
         pessoaid: Sequelize.INTEGER,
         agendamentoid: Sequelize.INTEGER,
       },
@@ -17,6 +13,8 @@ class PessoaAgendamento extends Model {
         freezeTableName: true,
       }
     );
+
+    PessoaAgendamento.removeAttribute('id');
 
     return this;
   }
