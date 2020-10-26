@@ -117,12 +117,10 @@ class SchedulingController {
 
     promise
       .catch(error => {
-        return res
-          .json(error.status)
-          .json({ error: 'Error saving schedules.' });
+        return res.status(400).json(error);
       })
-      .finally(() => {
-        return res.json({ error: 'Schedules done successfully.' });
+      .then(data => {
+        return res.status(200).json(data);
       });
 
     return promise;
