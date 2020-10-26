@@ -1,5 +1,7 @@
 import { Sequelize, Model } from 'sequelize';
 
+import PessoaAgendamento from './PessoaAgendamento';
+
 class Agendamento extends Model {
   static init(sequelize) {
     super.init(
@@ -7,6 +9,10 @@ class Agendamento extends Model {
         id: {
           type: Sequelize.INTEGER,
           primaryKey: true,
+        },
+        pessoa: {
+          type: Sequelize.VIRTUAL,
+          allowNull: false,
         },
         local: Sequelize.TEXT,
         datainicio: Sequelize.TEXT,
@@ -21,6 +27,15 @@ class Agendamento extends Model {
 
     this.addHook('beforeSave', async agendamento => {
       agendamento.id = (await Agendamento.max('id')) + 1;
+    });
+
+    this.addHook('afterSave', async agendamento => {
+      const agendamentoid = await Agendamento.max('id');
+
+      await PessoaAgendamento.create({
+        pessoaid: agendamento.pessoa,
+        agendamentoid,
+      });
     });
 
     return this;

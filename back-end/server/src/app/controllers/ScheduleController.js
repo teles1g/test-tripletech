@@ -49,7 +49,7 @@ class SchedulingController {
     const startDate = datainicio.replace(' ', 'T');
     const endDate = datafim.replace(' ', 'T');
 
-    const scheduleExists = await PessoaAgendamento.findAll({
+    const schedule = await PessoaAgendamento.findAll({
       where: {
         pessoaid: {
           [Op.or]: [pessoa1, pessoa2, pessoa3],
@@ -67,63 +67,42 @@ class SchedulingController {
       ],
     });
 
-    if (scheduleExists.length > 0) {
+    if (schedule.length > 0) {
       return res
         .status(400)
-        .json({ error: 'You cannot saving this schedule.' });
+        .json({ error: 'You cannot save these schedules.' });
     }
 
-    const schedule1 = await Agendamento.create({
+    const first = await Agendamento.create({
+      pessoa: pessoa1,
       datainicio: startDate,
       datafim: endDate,
       local: faker.address.city(),
     });
 
-    const schedule2 = await Agendamento.create({
+    const second = await Agendamento.create({
+      pessoa: pessoa2,
       datainicio: startDate,
       datafim: endDate,
       local: faker.address.city(),
     });
 
-    const schedule3 = await Agendamento.create({
+    const third = await Agendamento.create({
+      pessoa: pessoa3,
       datainicio: startDate,
       datafim: endDate,
       local: faker.address.city(),
     });
 
-    const person1 = await PessoaAgendamento.create({
-      pessoaid: pessoa1,
-      agendamentoid: schedule1.id,
-    });
+    const promise = Promise.all([first, second, third]);
 
-    const person2 = await PessoaAgendamento.create({
-      pessoaid: pessoa2,
-      agendamentoid: schedule2.id,
-    });
-
-    const person3 = await PessoaAgendamento.create({
-      pessoaid: pessoa3,
-      agendamentoid: schedule3.id,
-    });
-
-    const promise = Promise.all([
-      schedule1,
-      schedule2,
-      schedule3,
-      person1,
-      person2,
-      person3,
-    ]);
-
-    promise
+    return promise
       .catch(error => {
         return res.status(400).json(error);
       })
       .then(data => {
         return res.status(200).json(data);
       });
-
-    return promise;
   }
 
   async update(req, res) {
