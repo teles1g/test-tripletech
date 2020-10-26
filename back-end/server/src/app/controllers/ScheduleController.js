@@ -145,11 +145,11 @@ class SchedulingController {
         datainicio: startDate,
         datafim: endDate,
       });
+
+      return res.status(200).json(schedule);
     } catch (error) {
       return res.status(400).json({ error: 'Error updating schedules.' });
     }
-
-    return res.json(schedule);
   }
 }
 
